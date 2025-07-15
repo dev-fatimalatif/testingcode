@@ -1,0 +1,69 @@
+version: 0.2
+run-as: root
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+    commands:
+      - echo "Installing dependencies..."
+      - npm -v
+      - node -v
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - echo "Repository URI - $REPOSITORY_URI"
+      - echo "Fetching Docker credentials from SSM Parameter Store..."
+      - DOCKER_USERNAME=$(aws ssm get-parameter --name "/Docker/username" --with-decryption --query "Parameter.Value" --output text)
+      - DOCKER_PASSWORD=$(aws ssm get-parameter --name "/Docker/password" --with-decryption --query "Parameter.Value" --output text)
+      # Use the fetched credentials for Docker login
+      - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+
+  pre_build:
+    commands:
+      - echo "Installing dependencies..."
+
+  build:
+    commands:
+      - echo "Fetching environment variables from SSM Parameter Store..."
+      - |
+        aws ssm get-parameters-by-path \
+          --path "/rfp/dev/BE" \
+          --recursive \
+          --with-decryption \
+          --query "Parameters[].[Name,Value]" \
+          --output text | while read name value; do
+          key=$(basename "$name")
+          echo "${key}=${value}" >> .env.production
+        done
+      - echo "Environment variables written to .env file:"
+      - cat .env.production
+      - echo "Code Commit ID ==== $CODEBUILD_RESOLVED_SOURCE_VERSION"
+      - echo "Build started on `date`"
+      - |
+        if [ -z "$ROLLBACK_COMMIT_ID" ]; then
+          echo "Building the docker image"
+          docker build --tag $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION -f Dockerfile.dev .
+        else
+          echo "Docker build not required"
+        fi
+      - |
+        if [ -z "$ROLLBACK_COMMIT_ID" ]; then
+          echo "Tagging the docker image"
+          docker tag $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+        else
+          echo "Image tag not required"
+        fi
+
+  post_build:
+    commands:
+      - echo "Build completed on `date`"
+      - |
+        if [ -z "$ROLLBACK_COMMIT_ID" ]; then
+          IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION"
+          docker push $IMAGE_URI
+        else
+          echo "Image push not required"
+          IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$ROLLBACK_COMMIT_ID"
+        fi
+      - aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri $IMAGE_URI
