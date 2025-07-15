@@ -1,276 +1,276 @@
 
-name: Deploy and Run Application on Windows Server
+# name: Deploy and Run Application on Windows Server
 
-on:
-  push:
-    branches:
-       - deployment-dev # Replace with the branch
-permissions:
-  contents: write
-  actions: write 
-  id-token: write
-  security-events: write
+# on:
+#   push:
+#     branches:
+#        - deployment-dev # Replace with the branch
+# permissions:
+#   contents: write
+#   actions: write 
+#   id-token: write
+#   security-events: write
   
-jobs:
-  deploy-and-run:
-    runs-on: self-hosted # Ensure this runner is properly set up on your Windows
+# jobs:
+#   deploy-and-run:
+#     runs-on: self-hosted # Ensure this runner is properly set up on your Windows
 
-    steps:
-      # Step 1: Checkout the Code
-      - name: Checkout Code
-        uses: actions/checkout@v3
+#     steps:
+#       # Step 1: Checkout the Code
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
 
-      # Step 2: Set up environment based on branch
-      - name: Set up environment based on branch
-        id: set_env
-        shell: powershell
-        run: |
-          # Get the branch name from GITHUB_REF
-          $branch = $env:GITHUB_REF
-          Write-Host "Branch is $branch"
+#       # Step 2: Set up environment based on branch
+#       - name: Set up environment based on branch
+#         id: set_env
+#         shell: powershell
+#         run: |
+#           # Get the branch name from GITHUB_REF
+#           $branch = $env:GITHUB_REF
+#           Write-Host "Branch is $branch"
 
-      # Step 3: Initialize .env.production with UTF-8 encoding
-      - name: Initialize .env.production with UTF-8 encoding
-        run: |
-          "" | Out-File -FilePath .env.production -Encoding utf8
-        shell: powershell
+#       # Step 3: Initialize .env.production with UTF-8 encoding
+#       - name: Initialize .env.production with UTF-8 encoding
+#         run: |
+#           "" | Out-File -FilePath .env.production -Encoding utf8
+#         shell: powershell
 
-      # Step 4: Append secrets to .env file based on the branch
-      - name: Append secrets to .env.production based on branch
-        run: |
-              if ($env:GITHUB_REF -eq "refs/heads/deployment-dev") {
-                Write-Host "Using secrets for deployment-dev branch"
-                Add-Content -Path .env.production -Value "PORT=$env:DEV_PORT" -Encoding utf8
-                Add-Content -Path .env.production -Value "DB_HOST=$env:DEV_DB_HOST" -Encoding utf8
-                Add-Content -Path .env.production -Value "CONNECTION_URI=$env:DEV_CONNECTION_URI" -Encoding utf8
-                Add-Content -Path .env.production -Value "DB_DATABASE=$env:DEV_DB_DATABASE" -Encoding utf8
-                Add-Content -Path .env.production -Value "ACCESS_SECRET_KEY=$env:DEV_ACCESS_SECRET_KEY" -Encoding utf8
-                Add-Content -Path .env.production -Value "REFRESH_SECRET_KEY=$env:DEV_REFRESH_SECRET_KEY" -Encoding utf8
-                Add-Content -Path .env.production -Value "LOG_FORMAT=$env:DEV_LOG_FORMAT" -Encoding utf8
-                Add-Content -Path .env.production -Value "LOG_DIR=$env:DEV_LOG_DIR" -Encoding utf8
-                Add-Content -Path .env.production -Value "ORIGIN=$env:DEV_ORIGIN" -Encoding utf8
-                Add-Content -Path .env.production -Value "CREDENTIALS=$env:DEV_CREDENTIALS" -Encoding utf8
-                Add-Content -Path .env.production -Value "PROMPT_API_BASE_PATH=$env:DEV_PROMPT_API_BASE_PATH" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_REGION=$env:DEV_AWS_REGION" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_ACCESS_KEY_ID=$env:DEV_AWS_ACCESS_KEY_ID" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_SECRET_ACCESS_KEY=$env:DEV_AWS_SECRET_ACCESS_KEY" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_S3_BUCKET=$env:DEV_AWS_S3_BUCKET" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_COGNITO_USER_POOL_ID=$env:DEV_AWS_COGNITO_USER_POOL_ID" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_ID=$env:DEV_AWS_COGNITO_CLIENT_ID" -Encoding utf8
-                Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_SECRET=$env:DEV_AWS_COGNITO_CLIENT_SECRET" -Encoding utf8
-              } else {
-                Write-Host "No environment specified for this branch, using default secrets"
-                Add-Content -Path .env.production -Value "DB_HOST=$env:DB_HOST_DEFAULT" -Encoding utf8
-                Add-Content -Path .env.production -Value "API_KEY=$env:API_KEY_DEFAULT" -Encoding utf8
-              }
+#       # Step 4: Append secrets to .env file based on the branch
+#       - name: Append secrets to .env.production based on branch
+#         run: |
+#               if ($env:GITHUB_REF -eq "refs/heads/deployment-dev") {
+#                 Write-Host "Using secrets for deployment-dev branch"
+#                 Add-Content -Path .env.production -Value "PORT=$env:DEV_PORT" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "DB_HOST=$env:DEV_DB_HOST" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "CONNECTION_URI=$env:DEV_CONNECTION_URI" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "DB_DATABASE=$env:DEV_DB_DATABASE" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "ACCESS_SECRET_KEY=$env:DEV_ACCESS_SECRET_KEY" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "REFRESH_SECRET_KEY=$env:DEV_REFRESH_SECRET_KEY" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "LOG_FORMAT=$env:DEV_LOG_FORMAT" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "LOG_DIR=$env:DEV_LOG_DIR" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "ORIGIN=$env:DEV_ORIGIN" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "CREDENTIALS=$env:DEV_CREDENTIALS" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "PROMPT_API_BASE_PATH=$env:DEV_PROMPT_API_BASE_PATH" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_REGION=$env:DEV_AWS_REGION" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_ACCESS_KEY_ID=$env:DEV_AWS_ACCESS_KEY_ID" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_SECRET_ACCESS_KEY=$env:DEV_AWS_SECRET_ACCESS_KEY" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_S3_BUCKET=$env:DEV_AWS_S3_BUCKET" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_COGNITO_USER_POOL_ID=$env:DEV_AWS_COGNITO_USER_POOL_ID" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_ID=$env:DEV_AWS_COGNITO_CLIENT_ID" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_SECRET=$env:DEV_AWS_COGNITO_CLIENT_SECRET" -Encoding utf8
+#               } else {
+#                 Write-Host "No environment specified for this branch, using default secrets"
+#                 Add-Content -Path .env.production -Value "DB_HOST=$env:DB_HOST_DEFAULT" -Encoding utf8
+#                 Add-Content -Path .env.production -Value "API_KEY=$env:API_KEY_DEFAULT" -Encoding utf8
+#               }
           
-              # Verify file content right after writing
-              Write-Host "Contents of .env.production after writing:"
-              type .env.production
-        shell: powershell
-        env:
-              DEV_PORT: ${{ secrets.DEV_PORT }}
-              DEV_DB_HOST: ${{ secrets.DEV_DB_HOST }}
-              DEV_CONNECTION_URI: ${{ secrets.DEV_CONNECTION_URI }}
-              DEV_DB_DATABASE: ${{ secrets.DEV_DB_DATABASE }}
-              DEV_ACCESS_SECRET_KEY: ${{ secrets.DEV_ACCESS_SECRET_KEY }}
-              DEV_REFRESH_SECRET_KEY: ${{ secrets.DEV_REFRESH_SECRET_KEY }}
-              DEV_LOG_FORMAT: ${{ secrets.DEV_LOG_FORMAT }}
-              DEV_LOG_DIR: ${{ secrets.DEV_LOG_DIR }}
-              DEV_ORIGIN: ${{ secrets.DEV_ORIGIN }}
-              DEV_CREDENTIALS: ${{ secrets.DEV_CREDENTIALS }}
-              DEV_PROMPT_API_BASE_PATH: ${{ secrets.DEV_PROMPT_API_BASE_PATH }}
-              DEV_AWS_REGION: ${{ secrets.DEV_AWS_REGION }}
-              DEV_AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-              DEV_AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-              DEV_AWS_S3_BUCKET: ${{ secrets.DEV_AWS_S3_BUCKET }}
-              DEV_AWS_COGNITO_USER_POOL_ID: ${{ secrets.DEV_AWS_COGNITO_USER_POOL_ID }}
-              DEV_AWS_COGNITO_CLIENT_ID: ${{ secrets.DEV_AWS_COGNITO_CLIENT_ID }}
-              DEV_AWS_COGNITO_CLIENT_SECRET: ${{ secrets.DEV_AWS_COGNITO_CLIENT_SECRET }}
-              DB_HOST_DEFAULT: ${{ secrets.DB_HOST_DEFAULT }}
-              API_KEY_DEFAULT: ${{ secrets.API_KEY_DEFAULT }}
+#               # Verify file content right after writing
+#               Write-Host "Contents of .env.production after writing:"
+#               type .env.production
+#         shell: powershell
+#         env:
+#               DEV_PORT: ${{ secrets.DEV_PORT }}
+#               DEV_DB_HOST: ${{ secrets.DEV_DB_HOST }}
+#               DEV_CONNECTION_URI: ${{ secrets.DEV_CONNECTION_URI }}
+#               DEV_DB_DATABASE: ${{ secrets.DEV_DB_DATABASE }}
+#               DEV_ACCESS_SECRET_KEY: ${{ secrets.DEV_ACCESS_SECRET_KEY }}
+#               DEV_REFRESH_SECRET_KEY: ${{ secrets.DEV_REFRESH_SECRET_KEY }}
+#               DEV_LOG_FORMAT: ${{ secrets.DEV_LOG_FORMAT }}
+#               DEV_LOG_DIR: ${{ secrets.DEV_LOG_DIR }}
+#               DEV_ORIGIN: ${{ secrets.DEV_ORIGIN }}
+#               DEV_CREDENTIALS: ${{ secrets.DEV_CREDENTIALS }}
+#               DEV_PROMPT_API_BASE_PATH: ${{ secrets.DEV_PROMPT_API_BASE_PATH }}
+#               DEV_AWS_REGION: ${{ secrets.DEV_AWS_REGION }}
+#               DEV_AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+#               DEV_AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+#               DEV_AWS_S3_BUCKET: ${{ secrets.DEV_AWS_S3_BUCKET }}
+#               DEV_AWS_COGNITO_USER_POOL_ID: ${{ secrets.DEV_AWS_COGNITO_USER_POOL_ID }}
+#               DEV_AWS_COGNITO_CLIENT_ID: ${{ secrets.DEV_AWS_COGNITO_CLIENT_ID }}
+#               DEV_AWS_COGNITO_CLIENT_SECRET: ${{ secrets.DEV_AWS_COGNITO_CLIENT_SECRET }}
+#               DB_HOST_DEFAULT: ${{ secrets.DB_HOST_DEFAULT }}
+#               API_KEY_DEFAULT: ${{ secrets.API_KEY_DEFAULT }}
 
-      # Step 5: Print Current Directory
-      - name: Print Current Directory
-        run: |
-          echo "Current Directory:"
-          cd
-        shell: cmd
+#       # Step 5: Print Current Directory
+#       - name: Print Current Directory
+#         run: |
+#           echo "Current Directory:"
+#           cd
+#         shell: cmd
 
 
-       # Step 5: Log in to Docker Hub
-      - name: Log in to Docker Hub
-        run: docker login -u hussy401 -p 277242hasS
+#        # Step 5: Log in to Docker Hub
+#       - name: Log in to Docker Hub
+#         run: docker login -u hussy401 -p 277242hasS
         
-      # Step 6: Forcefully Copy File to Target Directory
-      - name: Forcefully Copy Files to Target Directory
-        run: |
-          robocopy . "C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend" /MIR /E /PURGE /COPYALL /IS /Z /MT:8 || exit 0
-        shell: cmd
+#       # Step 6: Forcefully Copy File to Target Directory
+#       - name: Forcefully Copy Files to Target Directory
+#         run: |
+#           robocopy . "C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend" /MIR /E /PURGE /COPYALL /IS /Z /MT:8 || exit 0
+#         shell: cmd
 
-      # Step 7: Check, Stop and Restart backend Server
-      - name: Check, Stop and Restart backend Server
-        run: |
-          cd C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend
+#       # Step 7: Check, Stop and Restart backend Server
+#       - name: Check, Stop and Restart backend Server
+#         run: |
+#           cd C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend
 
-          $dockerStatus = docker-compose ps --services --filter "status=running" | Select-String -Pattern "backend_server|nginx"
+#           $dockerStatus = docker-compose ps --services --filter "status=running" | Select-String -Pattern "backend_server|nginx"
 
-          if ($dockerStatus) {
-              Write-Host "Stopping backend  & nginx container..."
-              docker-compose stop backend_server nginx
-              Start-Sleep -Seconds 200
-              docker-compose up --build -d backend_server nginx
-              Write-Host "backend & nginx container restarted."
-              Start-Sleep -Seconds 100
-              docker-compose exec nginx ls /etc/nginx/ssl
-          } else {
-              Write-Host "Starting all Docker Compose containers..."
-              docker-compose up -d
-          }
-        shell: powershell
+#           if ($dockerStatus) {
+#               Write-Host "Stopping backend  & nginx container..."
+#               docker-compose stop backend_server nginx
+#               Start-Sleep -Seconds 200
+#               docker-compose up --build -d backend_server nginx
+#               Write-Host "backend & nginx container restarted."
+#               Start-Sleep -Seconds 100
+#               docker-compose exec nginx ls /etc/nginx/ssl
+#           } else {
+#               Write-Host "Starting all Docker Compose containers..."
+#               docker-compose up -d
+#           }
+#         shell: powershell
         
-      - name: Set commit ID as secret
-        if: success()
-        run: |
-          # Load system PATH into current session
-          $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ";" + 
-                      [System.Environment]::GetEnvironmentVariable('Path', 'User') + ";" +
-                      "C:\Program Files\GitHub CLI\bin"
+#       - name: Set commit ID as secret
+#         if: success()
+#         run: |
+#           # Load system PATH into current session
+#           $env:Path = [System.Environment]::GetEnvironmentVariable('Path', 'Machine') + ";" + 
+#                       [System.Environment]::GetEnvironmentVariable('Path', 'User') + ";" +
+#                       "C:\Program Files\GitHub CLI\bin"
           
-          # Verify gh is accessible
-          gh --version
+#           # Verify gh is accessible
+#           gh --version
           
-          # Set secret
-          $commitId = git rev-parse HEAD
-          Write-Host "Saving commit ID: $commitId to GitHub Secret."
-          echo "$commitId" | gh secret set LAST_SUCCESSFUL_COMMIT
-        shell: powershell
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+#           # Set secret
+#           $commitId = git rev-parse HEAD
+#           Write-Host "Saving commit ID: $commitId to GitHub Secret."
+#           echo "$commitId" | gh secret set LAST_SUCCESSFUL_COMMIT
+#         shell: powershell
+#         env:
+#           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
           
-      # Step 8: Show the Contents of .env.production File
-      - name: Show .env.production File Contents
-        run: |
-          type .env.production
-        shell: powershell
+#       # Step 8: Show the Contents of .env.production File
+#       - name: Show .env.production File Contents
+#         run: |
+#           type .env.production
+#         shell: powershell
         
-  rollback:
-       if: failure()
-       needs: deploy-and-run
-       runs-on: self-hosted # Ensure this runner is properly set up on your Windows
+#   rollback:
+#        if: failure()
+#        needs: deploy-and-run
+#        runs-on: self-hosted # Ensure this runner is properly set up on your Windows
 
-       steps:
-        - name: Retrieve Last Successful Commit from GitHub Secret
-          id: last_commit
-          run: |
-            Write-Host "Fetching last successful commit from GitHub Secret..."
-            # $LAST_COMMIT = "${{ secrets.LAST_SUCCESSFUL_COMMIT }}"
-            $LAST_COMMIT = "${{ secrets.LAST_SUCCESSFUL_COMMIT }}" -replace '[^a-f0-9]', ''
-            if (-not $LAST_COMMIT -or $LAST_COMMIT -eq '') {
-                Write-Host "No last successful commit found in secrets. Using previous commit."
-                $LAST_COMMIT = git rev-parse HEAD~1
-            }
+#        steps:
+#         - name: Retrieve Last Successful Commit from GitHub Secret
+#           id: last_commit
+#           run: |
+#             Write-Host "Fetching last successful commit from GitHub Secret..."
+#             # $LAST_COMMIT = "${{ secrets.LAST_SUCCESSFUL_COMMIT }}"
+#             $LAST_COMMIT = "${{ secrets.LAST_SUCCESSFUL_COMMIT }}" -replace '[^a-f0-9]', ''
+#             if (-not $LAST_COMMIT -or $LAST_COMMIT -eq '') {
+#                 Write-Host "No last successful commit found in secrets. Using previous commit."
+#                 $LAST_COMMIT = git rev-parse HEAD~1
+#             }
    
-            Write-Host "Last stable commit: $LAST_COMMIT"
-            echo "LAST_COMMIT=$LAST_COMMIT" | Out-File -FilePath $env:GITHUB_ENV -Append
-          shell: powershell
+#             Write-Host "Last stable commit: $LAST_COMMIT"
+#             echo "LAST_COMMIT=$LAST_COMMIT" | Out-File -FilePath $env:GITHUB_ENV -Append
+#           shell: powershell
  
-        - name: Checkout Last Stable Commit
-          shell: powershell
-          run: |
-            Write-Host "Checking out last stable commit..."
-            git checkout $env:LAST_COMMIT
-        # Rest of your existing steps remain the same below
-        - name: Initialize .env.production with UTF-8 encoding
-          run: |
-            "" | Out-File -FilePath .env.production -Encoding utf8
-          shell: powershell
+#         - name: Checkout Last Stable Commit
+#           shell: powershell
+#           run: |
+#             Write-Host "Checking out last stable commit..."
+#             git checkout $env:LAST_COMMIT
+#         # Rest of your existing steps remain the same below
+#         - name: Initialize .env.production with UTF-8 encoding
+#           run: |
+#             "" | Out-File -FilePath .env.production -Encoding utf8
+#           shell: powershell
 
-        - name: Append secrets to .env.production based on branch
-          run: |
-                if ($env:GITHUB_REF -eq "refs/heads/deployment-dev") {
-                  Write-Host "Using secrets for deployment-dev branch"
-                  Add-Content -Path .env.production -Value "PORT=$env:DEV_PORT" -Encoding utf8
-                  Add-Content -Path .env.production -Value "DB_HOST=$env:DEV_DB_HOST" -Encoding utf8
-                  Add-Content -Path .env.production -Value "CONNECTION_URI=$env:DEV_CONNECTION_URI" -Encoding utf8
-                  Add-Content -Path .env.production -Value "DB_DATABASE=$env:DEV_DB_DATABASE" -Encoding utf8
-                  Add-Content -Path .env.production -Value "ACCESS_SECRET_KEY=$env:DEV_ACCESS_SECRET_KEY" -Encoding utf8
-                  Add-Content -Path .env.production -Value "REFRESH_SECRET_KEY=$env:DEV_REFRESH_SECRET_KEY" -Encoding utf8
-                  Add-Content -Path .env.production -Value "LOG_FORMAT=$env:DEV_LOG_FORMAT" -Encoding utf8
-                  Add-Content -Path .env.production -Value "LOG_DIR=$env:DEV_LOG_DIR" -Encoding utf8
-                  Add-Content -Path .env.production -Value "ORIGIN=$env:DEV_ORIGIN" -Encoding utf8
-                  Add-Content -Path .env.production -Value "CREDENTIALS=$env:DEV_CREDENTIALS" -Encoding utf8
-                  Add-Content -Path .env.production -Value "PROMPT_API_BASE_PATH=$env:DEV_PROMPT_API_BASE_PATH" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_REGION=$env:DEV_AWS_REGION" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_ACCESS_KEY_ID=$env:DEV_AWS_ACCESS_KEY_ID" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_SECRET_ACCESS_KEY=$env:DEV_AWS_SECRET_ACCESS_KEY" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_S3_BUCKET=$env:DEV_AWS_S3_BUCKET" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_COGNITO_USER_POOL_ID=$env:DEV_AWS_COGNITO_USER_POOL_ID" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_ID=$env:DEV_AWS_COGNITO_CLIENT_ID" -Encoding utf8
-                  Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_SECRET=$env:DEV_AWS_COGNITO_CLIENT_SECRET" -Encoding utf8
-                } else {
-                  Write-Host "No environment specified for this branch, using default secrets"
-                  Add-Content -Path .env.production -Value "DB_HOST=$env:DB_HOST_DEFAULT" -Encoding utf8
-                  Add-Content -Path .env.production -Value "API_KEY=$env:API_KEY_DEFAULT" -Encoding utf8
-                }
+#         - name: Append secrets to .env.production based on branch
+#           run: |
+#                 if ($env:GITHUB_REF -eq "refs/heads/deployment-dev") {
+#                   Write-Host "Using secrets for deployment-dev branch"
+#                   Add-Content -Path .env.production -Value "PORT=$env:DEV_PORT" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "DB_HOST=$env:DEV_DB_HOST" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "CONNECTION_URI=$env:DEV_CONNECTION_URI" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "DB_DATABASE=$env:DEV_DB_DATABASE" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "ACCESS_SECRET_KEY=$env:DEV_ACCESS_SECRET_KEY" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "REFRESH_SECRET_KEY=$env:DEV_REFRESH_SECRET_KEY" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "LOG_FORMAT=$env:DEV_LOG_FORMAT" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "LOG_DIR=$env:DEV_LOG_DIR" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "ORIGIN=$env:DEV_ORIGIN" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "CREDENTIALS=$env:DEV_CREDENTIALS" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "PROMPT_API_BASE_PATH=$env:DEV_PROMPT_API_BASE_PATH" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_REGION=$env:DEV_AWS_REGION" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_ACCESS_KEY_ID=$env:DEV_AWS_ACCESS_KEY_ID" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_SECRET_ACCESS_KEY=$env:DEV_AWS_SECRET_ACCESS_KEY" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_S3_BUCKET=$env:DEV_AWS_S3_BUCKET" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_COGNITO_USER_POOL_ID=$env:DEV_AWS_COGNITO_USER_POOL_ID" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_ID=$env:DEV_AWS_COGNITO_CLIENT_ID" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "AWS_COGNITO_CLIENT_SECRET=$env:DEV_AWS_COGNITO_CLIENT_SECRET" -Encoding utf8
+#                 } else {
+#                   Write-Host "No environment specified for this branch, using default secrets"
+#                   Add-Content -Path .env.production -Value "DB_HOST=$env:DB_HOST_DEFAULT" -Encoding utf8
+#                   Add-Content -Path .env.production -Value "API_KEY=$env:API_KEY_DEFAULT" -Encoding utf8
+#                 }
             
-                # Verify file content right after writing
-                Write-Host "Contents of .env.production after writing:"
-                type .env.production
-          shell: powershell
-          env:
-                DEV_PORT: ${{ secrets.DEV_PORT }}
-                DEV_DB_HOST: ${{ secrets.DEV_DB_HOST }}
-                DEV_CONNECTION_URI: ${{ secrets.DEV_CONNECTION_URI }}
-                DEV_DB_DATABASE: ${{ secrets.DEV_DB_DATABASE }}
-                DEV_ACCESS_SECRET_KEY: ${{ secrets.DEV_ACCESS_SECRET_KEY }}
-                DEV_REFRESH_SECRET_KEY: ${{ secrets.DEV_REFRESH_SECRET_KEY }}
-                DEV_LOG_FORMAT: ${{ secrets.DEV_LOG_FORMAT }}
-                DEV_LOG_DIR: ${{ secrets.DEV_LOG_DIR }}
-                DEV_ORIGIN: ${{ secrets.DEV_ORIGIN }}
-                DEV_CREDENTIALS: ${{ secrets.DEV_CREDENTIALS }}
-                DEV_PROMPT_API_BASE_PATH: ${{ secrets.DEV_PROMPT_API_BASE_PATH }}
-                DEV_AWS_REGION: ${{ secrets.DEV_AWS_REGION }}
-                DEV_AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-                DEV_AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-                DEV_AWS_S3_BUCKET: ${{ secrets.DEV_AWS_S3_BUCKET }}
-                DEV_AWS_COGNITO_USER_POOL_ID: ${{ secrets.DEV_AWS_COGNITO_USER_POOL_ID }}
-                DEV_AWS_COGNITO_CLIENT_ID: ${{ secrets.DEV_AWS_COGNITO_CLIENT_ID }}
-                DEV_AWS_COGNITO_CLIENT_SECRET: ${{ secrets.DEV_AWS_COGNITO_CLIENT_SECRET }}
-                DB_HOST_DEFAULT: ${{ secrets.DB_HOST_DEFAULT }}
-                API_KEY_DEFAULT: ${{ secrets.API_KEY_DEFAULT }}
+#                 # Verify file content right after writing
+#                 Write-Host "Contents of .env.production after writing:"
+#                 type .env.production
+#           shell: powershell
+#           env:
+#                 DEV_PORT: ${{ secrets.DEV_PORT }}
+#                 DEV_DB_HOST: ${{ secrets.DEV_DB_HOST }}
+#                 DEV_CONNECTION_URI: ${{ secrets.DEV_CONNECTION_URI }}
+#                 DEV_DB_DATABASE: ${{ secrets.DEV_DB_DATABASE }}
+#                 DEV_ACCESS_SECRET_KEY: ${{ secrets.DEV_ACCESS_SECRET_KEY }}
+#                 DEV_REFRESH_SECRET_KEY: ${{ secrets.DEV_REFRESH_SECRET_KEY }}
+#                 DEV_LOG_FORMAT: ${{ secrets.DEV_LOG_FORMAT }}
+#                 DEV_LOG_DIR: ${{ secrets.DEV_LOG_DIR }}
+#                 DEV_ORIGIN: ${{ secrets.DEV_ORIGIN }}
+#                 DEV_CREDENTIALS: ${{ secrets.DEV_CREDENTIALS }}
+#                 DEV_PROMPT_API_BASE_PATH: ${{ secrets.DEV_PROMPT_API_BASE_PATH }}
+#                 DEV_AWS_REGION: ${{ secrets.DEV_AWS_REGION }}
+#                 DEV_AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+#                 DEV_AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+#                 DEV_AWS_S3_BUCKET: ${{ secrets.DEV_AWS_S3_BUCKET }}
+#                 DEV_AWS_COGNITO_USER_POOL_ID: ${{ secrets.DEV_AWS_COGNITO_USER_POOL_ID }}
+#                 DEV_AWS_COGNITO_CLIENT_ID: ${{ secrets.DEV_AWS_COGNITO_CLIENT_ID }}
+#                 DEV_AWS_COGNITO_CLIENT_SECRET: ${{ secrets.DEV_AWS_COGNITO_CLIENT_SECRET }}
+#                 DB_HOST_DEFAULT: ${{ secrets.DB_HOST_DEFAULT }}
+#                 API_KEY_DEFAULT: ${{ secrets.API_KEY_DEFAULT }}
 
           
-        - name: Copy Stable Code to Local Runner
-          shell: powershell
-          run: |
-                Write-Host "Copying stable code to local runner directory..."
-                robocopy $env:GITHUB_WORKSPACE "C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend" /MIR /E /PURGE /COPYALL /IS /Z /MT:8 /LOG:C:\robocopy.log
+#         - name: Copy Stable Code to Local Runner
+#           shell: powershell
+#           run: |
+#                 Write-Host "Copying stable code to local runner directory..."
+#                 robocopy $env:GITHUB_WORKSPACE "C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend" /MIR /E /PURGE /COPYALL /IS /Z /MT:8 /LOG:C:\robocopy.log
                 
-                # Check the exit code of robocopy
-                if ($LASTEXITCODE -le 1) {
-                    Write-Host "Robocopy completed successfully with exit code $LASTEXITCODE."
-                    exit 0  # Treat exit code 0 and 1 as success
-                } elseif ($LASTEXITCODE -eq 3) {
-                    Write-Host "Robocopy encountered some errors (exit code 3). Check the log file for details."
-                    Write-Host "Log file contents:"
-                    Get-Content -Path C:\robocopy.log
-                    exit 0  # Treat exit code 3 as success (optional, depending on your use case)
-                } else {
-                    Write-Host "Robocopy failed with exit code $LASTEXITCODE."
-                    exit $LASTEXITCODE  # Exit with the robocopy exit code if it's greater than 3
-                }
+#                 # Check the exit code of robocopy
+#                 if ($LASTEXITCODE -le 1) {
+#                     Write-Host "Robocopy completed successfully with exit code $LASTEXITCODE."
+#                     exit 0  # Treat exit code 0 and 1 as success
+#                 } elseif ($LASTEXITCODE -eq 3) {
+#                     Write-Host "Robocopy encountered some errors (exit code 3). Check the log file for details."
+#                     Write-Host "Log file contents:"
+#                     Get-Content -Path C:\robocopy.log
+#                     exit 0  # Treat exit code 3 as success (optional, depending on your use case)
+#                 } else {
+#                     Write-Host "Robocopy failed with exit code $LASTEXITCODE."
+#                     exit $LASTEXITCODE  # Exit with the robocopy exit code if it's greater than 3
+#                 }
      
-        - name: Restart backend_server
-          shell: powershell
-          run: |
-            cd C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend
-            docker-compose stop backend_server nginx
-            docker-compose rm -f backend_server nginx
-            Start-Sleep -Seconds 200
-            docker-compose up --build -d backend_server nginx
-            Write-Host "backend & nginx container restarted."
-            Start-Sleep -Seconds 100
-            docker-compose exec nginx ls /etc/nginx/ssl
+#         - name: Restart backend_server
+#           shell: powershell
+#           run: |
+#             cd C:\Users\latiff3\Documents\rfp-autobid\backEnd\rfc-backend
+#             docker-compose stop backend_server nginx
+#             docker-compose rm -f backend_server nginx
+#             Start-Sleep -Seconds 200
+#             docker-compose up --build -d backend_server nginx
+#             Write-Host "backend & nginx container restarted."
+#             Start-Sleep -Seconds 100
+#             docker-compose exec nginx ls /etc/nginx/ssl
         
       
