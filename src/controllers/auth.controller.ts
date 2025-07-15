@@ -12,9 +12,11 @@ const setCookie = (res: Response, name, { token, expiresIn }, options = {}) => {
   const cookieOptions = {
     maxAge: expiresIn, // Default: 1 day
     httpOnly: true, // Prevents client-side access
-    sameSite: 'none',
+    // secure: false, // Set to true if using HTTPS
+    // path: '/',
+    // sameSite: 'none',
     // ...options, // Spread any additional options
-    secure: true, // Set to true if using HTTPS
+    secure: false, // Set to true if using HTTPS
     path: '/',
     // sameSite: 'none',
     ...options, // Spread any additional options

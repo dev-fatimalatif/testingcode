@@ -4,10 +4,11 @@ import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 import { LOG_DIR } from '@config';
 
-const logDir = '/tmp/logs';
+// logs dir
+const logDir: string = join(__dirname, LOG_DIR);
+
 if (!existsSync(logDir)) {
-  // mkdirSync(logDir);
-  mkdirSync(logDir, { recursive: true }); // This will now work in AWS Lambda
+  mkdirSync(logDir);
 }
 
 // Define log format

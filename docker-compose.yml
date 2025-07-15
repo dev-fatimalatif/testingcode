@@ -1,0 +1,179 @@
+
+
+
+# # version: "3.9"
+
+# networks:
+#   app-network:
+#     driver: bridge # ✅ Ensure all services use this network
+
+# services:
+#   frontend_server:
+#     container_name: frontend_server
+#     build:
+#       context: ../../frontEnd/rfc-frontend
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "5173:5173"
+#     env_file:
+#       - ../../frontEnd/rfc-frontend/.env.production
+#     volumes:
+#       - ../../frontEnd/rfc-frontend:/app
+#       - /app/node_modules
+#     restart: "unless-stopped"
+#     networks:
+#       - app-network # ✅ Ensure frontend is on the network
+
+#   backend_server:
+#     container_name: backend_server
+#     build:
+#       context: ./
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "3000:3000"
+#     env_file:
+#       - .env.production
+#     restart: "unless-stopped"
+#     networks:
+#       - app-network
+#     privileged: true
+
+#   fastapi_server:
+#     container_name: fastapi_server
+#     build:
+#       context: ../../fastApi/int-bd-rfp
+#       dockerfile: Dockerfile
+#     volumes:
+#       - ../../fastApi/int-bd-rfp:/app
+#     env_file:
+#       - ../../fastApi/int-bd-rfp/.env
+#     restart: "unless-stopped"
+#     networks:
+#       - app-network
+#     expose:
+#       - "8000"
+
+# version: "3.9"
+
+# networks:
+#   app-network:
+#     driver: bridge  # This creates a custom bridge network
+
+# services:
+#   frontend:
+#     container_name: frontend_server
+#     build:
+#       context: ../../frontEnd/rfc-frontend
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "5173:5173"
+#     env_file:
+#       - ../../frontEnd/rfc-frontend/.env.production
+#     volumes:
+#       - ../../frontEnd/rfc-frontend:/app
+#       - /app/node_modules
+#     restart: "unless-stopped"
+#     networks:
+#       - app-network
+
+#   backend_server:
+#     container_name: backend_server
+#     build:
+#       context: ./
+#       dockerfile: Dockerfile.dev
+#     ports:
+#       - "3000:3000"
+#     env_file:
+#       - .env.production  # For backend
+#     restart: "unless-stopped"
+#     networks:
+#       - app-network  # Connect to the custom network
+#     privileged: true  # Add this line to enable privileged mode
+#  # FastAPI service - Build from a Dockerfile in the cloned repo
+#   fastapi_server:
+#     container_name: fastapi_server
+#     build:
+#       context: ../../fastApi/int-bd-rfp  # Path to the cloned FastAPI repository
+#       dockerfile: Dockerfile  # Dockerfile for FastAPI
+#     # ports:
+#     #   - "8000:8000"
+#     volumes:
+#       - ../../fastApi/int-bd-rfp:/app  # Mount the FastAPI directory as a volume
+#     env_file:
+#       - ../../fastApi/int-bd-rfp/.env  # Load environment variablaes for FastAPI
+#     restart: "unless-stopped"
+#     networks:
+#       - app-network  # Connect to the custom network
+#     expose:
+#       - "8000"
+
+
+version: "3.9"
+
+networks:
+  app-network:
+    driver: bridge # ✅ Ensure all services use this network
+
+services:
+  frontend_server:
+    container_name: frontend_server
+    build:
+      context: ../../frontEnd/rfc-frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5174:5174"
+    env_file:
+      - ../../frontEnd/rfc-frontend/.env.production
+    volumes:
+      - ../../frontEnd/rfc-frontend:/app
+      - /app/node_modules
+    restart: "unless-stopped"
+    networks:
+      - app-network # ✅ Ensure frontend is on the network
+
+  backend_server:
+    container_name: backend_server
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    restart: "unless-stopped"
+    networks:
+      - app-network
+    privileged: true
+
+  fastapi_server:
+    container_name: fastapi_server
+    build:
+      context: ../../fastApi/int-bd-rfp
+      dockerfile: Dockerfile
+    volumes:
+      - ../../fastApi/int-bd-rfp:/app
+    env_file:
+      - ../../fastApi/int-bd-rfp/.env
+    restart: "unless-stopped"
+    networks:
+      - app-network
+    expose:
+      - "8000"
+
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    image: nginx
+    depends_on:
+      - frontend_server
+      - backend_server
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - app-network
+    volumes:
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "./ssl-certs/autobid.netsolpk.com:/etc/nginx/ssl"
+
+

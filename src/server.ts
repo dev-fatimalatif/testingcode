@@ -11,12 +11,10 @@ import { ChatMessageRoute } from './routes/chat-messages.route';
 import { RolePermissionRoute } from './routes/role-permissions.route';
 import { AnswerHistoryRoute } from './routes/answer-history.route';
 import { LibraryTrainingRoute } from './routes/library-training.route';
-import { APIGatewayProxyEvent, Context, Callback } from 'aws-lambda';
-import serverless from 'serverless-http';
-import dotenv from 'dotenv';
+
 ValidateEnv();
 
-const appInstance = new App([
+const app = new App([
   new AuthRoute(),
   new UserRoute(),
   new ProjectRoute(),
@@ -30,8 +28,4 @@ const appInstance = new App([
   new LibraryTrainingRoute(),
 ]);
 
-const serverlessApp = serverless(appInstance.getServer());
-
-export const handler = async (event: APIGatewayProxyEvent, context: Context, callback: Callback) => {
-  return serverlessApp(event, context, callback);
-};
+app.listen();

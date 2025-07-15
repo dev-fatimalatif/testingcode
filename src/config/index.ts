@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
-config({ path: `/var/task/.env.${process.env.NODE_ENV || 'development'}` });
-console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+config({ path: `.env.${process.env.NODE_ENV || 'development'}.local` });
+
 export const CREDENTIALS = process.env.CREDENTIALS === 'true';
 export const { NODE_ENV, PORT, ACCESS_SECRET_KEY, REFRESH_SECRET_KEY, LOG_FORMAT, LOG_DIR, ORIGIN, PROMPT_API_BASE_PATH } = process.env;
 export const { CONNECTION_URI, DB_DATABASE } = process.env;
